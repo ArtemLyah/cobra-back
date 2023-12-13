@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ReviewsEntity } from './review.entity';
 import { UserRoadmapsEntity } from './user_roadmaps.entity';
 
@@ -7,7 +7,7 @@ import { UserRoadmapsEntity } from './user_roadmaps.entity';
 })
 export class UsersEntity {
   @PrimaryGeneratedColumn('uuid')
-    id: number;
+    id: string;
 
   @Column({
     length: 100,
@@ -38,4 +38,7 @@ export class UsersEntity {
     onDelete: 'NO ACTION',
   })
     reviews: ReviewsEntity[];
+
+  @CreateDateColumn()
+    created_at: Date;
 }

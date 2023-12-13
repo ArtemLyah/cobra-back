@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { mongoConfig, postgresConfig } from '../configs/config';
-import { ReviewsEntity } from './entities/review.entity';
-import { RoadmapsEntity } from './entities/roadmaps.entity';
-import { TagsEntity } from './entities/tags.entity';
-import { UsersEntity } from './entities/users.entity';
-import { UserRoadmapsEntity } from './entities/user_roadmaps.entity';
-import { UserRepository } from './repositories/user.repository';
+import { ReviewsEntity } from '../databases/entities/review.entity';
+import { RoadmapsEntity } from '../databases/entities/roadmaps.entity';
+import { TagsEntity } from '../databases/entities/tags.entity';
+import { UsersEntity } from '../databases/entities/users.entity';
+import { UserRoadmapsEntity } from '../databases/entities/user_roadmaps.entity';
+import { UserRepository } from '../databases/repositories/user.repository';
 
 @Module({
   imports: [

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ReviewsEntity } from './review.entity';
 import { TagsEntity } from './tags.entity';
 import { UserRoadmapsEntity } from './user_roadmaps.entity';
@@ -15,7 +15,7 @@ export enum RoadmapDifficultyEnum {
 })
 export class RoadmapsEntity {
   @PrimaryGeneratedColumn('uuid')
-    id: number;
+    id: string;
 
   @Column()
     title: string;
@@ -30,10 +30,11 @@ export class RoadmapsEntity {
   })
     avatar: string;
   
-  @CreateDateColumn({
-    type: 'date',
-  })
+  @CreateDateColumn()
     created_at: Date;
+
+  @UpdateDateColumn()
+    updated_at: Date;
 
   @Column({
     enum: RoadmapDifficultyEnum,

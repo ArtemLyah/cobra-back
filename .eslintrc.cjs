@@ -24,7 +24,7 @@ module.exports = {
     'space-infix-ops': 'error',
     'semi': 'error',
     'quotes': ['error', 'single'],
-    'brace-style': 'error',
+    'brace-style': ['error', 'stroustrup'],
     'object-curly-spacing': ['error', 'always'],
     '@typescript-eslint/type-annotation-spacing': 'error',
     'no-extra-parens': 'error',
@@ -43,8 +43,9 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    "@typescript-eslint/no-unsafe-assignment": "warn",
+    "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-argument": "warn",
+    "@typescript-eslint/no-unsafe-return": "off",
     "@typescript-eslint/ban-types": "warn"
   },
 };

@@ -19,6 +19,10 @@ export class UserService {
     });
   }
 
+  get (userId: string) {
+    return this.userRepository.findById(userId);
+  }
+
   getAll () {
     return this.userRepository.find();
   }
