@@ -12,22 +12,22 @@ export class UserRepository {
 
   constructor (
     @InjectRepository(UsersEntity)
-      private repository: Repository<UsersEntity>
+      private repository: Repository<UsersEntity>,
   ) {}
   
-  async create (data: DeepPartial<UsersEntity>) {
+  async create (data: DeepPartial<UsersEntity>):  Promise<UsersEntity> {
     const user = this.repository.create(data);
     return await this.repository.save(user);
   }
   
-  find (query?: FindManyOptions<UsersEntity>) {
+  find (query?: FindManyOptions<UsersEntity>): Promise<UsersEntity[]> {
     return this.repository.find({
       relations: this.relations,
       ...query,
     });
   }
 
-  async findOne (query?: FindOneOptions<UsersEntity>) {
+  async findOne (query?: FindOneOptions<UsersEntity>): Promise<UsersEntity> {
     let response: UsersEntity;
     try {
       response = await this.repository.findOne({
@@ -41,11 +41,15 @@ export class UserRepository {
     return response;
   }
 
-  findById (userId: string) {
+  findById (userId: string): Promise<UsersEntity|null> {
     return this.findOne({
       where: {
         id: userId,
       },
     });
+  }
+
+  async deleteAll () {
+    return this.repository.remove(await this.find());
   }
 }

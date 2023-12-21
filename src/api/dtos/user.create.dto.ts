@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEmail, IsOptional, MinLength, MaxLength, Matches, IsUrl } from 'class-validator';
-import { validationOptionsMsg } from '../utils/validation';
+import { IsString, IsNotEmpty, IsEmail, MinLength, MaxLength, Matches, IsOptional, IsUrl } from 'class-validator';
+import { validationOptionsMsg } from '../../utils/validation';
 
 export class UserCreateDTO {
   @ApiProperty({
@@ -13,8 +13,8 @@ export class UserCreateDTO {
   @ApiProperty({
     description: 'Email of the user',
   })
-  @IsNotEmpty(validationOptionsMsg('Username cannot be empty'))
-  @IsEmail({}, validationOptionsMsg('Username must be email'))
+  @IsNotEmpty(validationOptionsMsg('Email cannot be empty'))
+  @IsEmail({}, validationOptionsMsg('Email must be email'))
     email: string;
   
   @ApiProperty({
@@ -25,9 +25,9 @@ export class UserCreateDTO {
   @MaxLength(32, validationOptionsMsg('Max length of password must be 32'))
   @Matches(/[a-zA-Z0-9\.\&\$*\/\\]+/, validationOptionsMsg('Password is not valid'))
     password: string;
-  
+
   @ApiPropertyOptional({
-    description: 'Users avatar link',
+    description: 'Link to the avatar',
   })
   @IsOptional()
   @IsUrl({}, validationOptionsMsg('Link of the avatar is not valid'))

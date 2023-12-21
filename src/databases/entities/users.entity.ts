@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ReviewsEntity } from './review.entity';
 import { UserRoadmapsEntity } from './user_roadmaps.entity';
 
@@ -15,6 +15,9 @@ export class UsersEntity {
     username: string;
 
   @Column({
+    unique: true,
+  })
+  @Index({
     unique: true,
   })
     email: string;

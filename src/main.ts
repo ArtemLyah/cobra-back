@@ -1,7 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { configuration } from './configs/config';
-import { AppModule } from './modules/app.module';
+import { AppModule } from './api/modules/app.module';
 import { GlobalExceptionFilter, validationExceptionFactory } from './utils/GlobalExceptionFilter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 

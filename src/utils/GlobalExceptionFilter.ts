@@ -29,6 +29,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       status = status ?? exception.getStatus() ?? HttpStatus.INTERNAL_SERVER_ERROR;
     }
     else {
+      console.error(exception.stack);
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       message = {
         message: 'An error occured on the server side',

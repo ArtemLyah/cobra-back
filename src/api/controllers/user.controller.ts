@@ -1,11 +1,10 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { CreateUserPipe } from '../security/pipes/CreateUserPipe';
-import { UserCreateDTO } from '../dtos/user.create.dto';
-import { UserByIdPipe } from '../security/pipes/UserWithIdPipe';
+import { Controller, Delete, Get, Param } from '@nestjs/common';
+import { UserByIdPipe } from '../../security/pipes/UserWithIdPipe';
 import { UserService } from '../services/user.service';
-import { ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UserMapper } from '../mappers/user.mapper';
 import { UserResponse, UsersResponse } from '../responses/user.response';
+import { ApiEndpoint } from '../../decorators/ApiEndpoint';
 
 @ApiTags('users')
 @Controller('users')
@@ -18,7 +17,7 @@ export class UserController {
   @ApiOkResponse({
     type: UsersResponse,
   })
-  @ApiOperation({
+  @ApiEndpoint({
     summary: 'returns all users',
   })
   @Get('/')
@@ -30,28 +29,28 @@ export class UserController {
   @ApiOkResponse({
     type: UserResponse,
   })
+  @ApiBadRequestResponse({
+    description: `
+    InvalidEntityIdException:
+      User with such id is not found
+    `,
+  })
   @ApiParam({
     name: 'userId',
     description: 'User\'s id',
   })
-  @ApiOperation({
+  @ApiEndpoint({
     summary: 'return user\'s information',
+    isBearer: true,
   })
   @Get('/:userId') 
   async get (@Param('userId', UserByIdPipe) userId: string) {
-    const user = await this.userService.get(userId);
+    const user = await this.userService.getById(userId);
     return this.userMapper.get(user);
   }
 
-  @ApiOkResponse({
-    type: UserResponse,
-  })
-  @ApiOperation({
-    summary: 'create user',
-  })
-  @Post()
-  async create (@Body(CreateUserPipe) data: UserCreateDTO) {
-    const user = await this.userService.create(data);
-    return this.userMapper.get(user);
+  @Delete('/')
+  async deleteAll () {
+    await this.userService.deleteAll();
   }
 }

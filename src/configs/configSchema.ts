@@ -1,6 +1,7 @@
 class ServerConfig {
   host: string;
   port: number;
+  secret: string;
 }
 
 class DatabaseConfig {

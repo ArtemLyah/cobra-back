@@ -9,7 +9,6 @@ export class UserByIdPipe implements PipeTransform<string, Promise<string>> {
   ) {}
 
   async transform (userId: string) {
-    console.log(userId);
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new InvalidEntityIdException('User');

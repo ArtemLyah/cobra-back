@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UsersEntity } from 'src/databases/entities/users.entity';
+import { UsersEntity } from '../../databases/entities/users.entity';
 
 @Injectable()
 export class UserMapper {
@@ -9,6 +9,7 @@ export class UserMapper {
       email: user.email,
       avatar: user.avatar,
       created_at: user.created_at,
+      passwordHash: user.passwordHash,
     };
   }
 
