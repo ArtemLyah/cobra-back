@@ -1,5 +1,6 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { ApiEndpoint } from '../../decorators/ApiEndpoint';
 import { LoginDTO } from '../dtos/login.dto';
 import { RegisterDTO } from '../dtos/register.dto';
@@ -27,5 +28,14 @@ export class AuthController {
   @Post('register')
   register (@Body() data: RegisterDTO) {
     return this.authService.register(data);
+  }
+
+  @ApiEndpoint({
+    summary: 'Verify jwt token',
+    isBearer: true,
+  })
+  @Get('verifyToken')
+  verifyToken (@Req() req: Request) {
+    return req['user'];
   }
 }
