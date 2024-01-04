@@ -1,10 +1,12 @@
-import { Controller, Delete, Get, Param } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import { UserByIdPipe } from '../../security/pipes/UserWithIdPipe';
 import { UserService } from '../services/user.service';
-import { ApiBadRequestResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiOkResponse, ApiParam, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { UserMapper } from '../mappers/user.mapper';
 import { UserResponse, UsersResponse } from '../responses/user.response';
 import { ApiEndpoint } from '../../decorators/ApiEndpoint';
+import { UserUpdateDTO } from '../dtos/user.update.dto';
+import { OkResponse } from '../responses/ok.response';
 
 @ApiTags('users')
 @Controller('users')
@@ -18,7 +20,7 @@ export class UserController {
     type: UsersResponse,
   })
   @ApiEndpoint({
-    summary: 'returns all users',
+    summary: 'return all users',
   })
   @Get('/')
   async getAll () {
@@ -48,9 +50,77 @@ export class UserController {
     const user = await this.userService.getById(userId);
     return this.userMapper.get(user);
   }
+  
+  @ApiOkResponse({
+    type: UserResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: `
+    UnauthorizedException:
+      Unauthorized
+      Invalid token
+      User is unauthorized
+    `,
+  })
+  @ApiBadRequestResponse({
+    description: `
+    InvalidEntityIdException:
+      User with such id is not found
 
-  @Delete('/')
-  async deleteAll () {
-    await this.userService.deleteAll();
+    InvalidBodyException:
+      Username must be string
+      Link of the avatar is not valid
+    `,
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'User\'s id',
+  })
+  @ApiEndpoint({
+    summary: 'Update user info',
+    isBearer: true,
+  })
+  @Patch('/:userId') 
+  async update (
+    @Param('userId', UserByIdPipe) userId: string,
+    @Body() data: UserUpdateDTO,
+  ): Promise<UserResponse> {
+    const user = await this.userService.update(userId, data);
+    return this.userMapper.get(user);
+  }
+  
+  @ApiOkResponse({
+    type: OkResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: `
+    UnauthorizedException:
+      Unauthorized
+      Invalid token
+      User is unauthorized
+    `,
+  })
+  @ApiBadRequestResponse({
+    description: `
+    InvalidEntityIdException:
+      User with such id is not found
+    `,
+  })
+  @ApiEndpoint({
+    summary: 'Delete user',
+    isBearer: true,
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'User\'s id',
+  })
+  @Delete('/:userId') 
+  async delete (
+    @Param('userId', UserByIdPipe) userId: string,
+  ): Promise<OkResponse> {
+    await this.userService.delete(userId);
+    return {
+      message: 'Ok',
+    };
   }
 }

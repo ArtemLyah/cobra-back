@@ -23,26 +23,23 @@ export class JwtGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    try {
-      const payload = await this.jwtService.verifyAsync<UserPayload>(token, {
-        secret: configuration().server.secret,
-      });
-      
-      const user = await this.userService.getById(payload.user_id);
+    const payload = await this.jwtService.verifyAsync<UserPayload>(token, {
+      secret: configuration().server.secret,
+    }).catch(() => {
+      throw new UnauthorizedException('Invalid token');
+    });
 
-      if (!user) {
-        throw new UnauthorizedException();
-      }
+    const user = await this.userService.getById(payload.user_id);
 
-      request['user'] = {
-        user_id: user.id,
-        username: user.username,
-        avatar: user.avatar,
-      };
-    } 
-    catch (error) {
-      throw new UnauthorizedException();
+    if (!user) {
+      throw new UnauthorizedException('User is unauthorized');
     }
+
+    request['user'] = {
+      user_id: user.id,
+      username: user.username,
+      avatar: user.avatar,
+    }; 
 
     return true;
   }

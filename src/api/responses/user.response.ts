@@ -10,6 +10,11 @@ export class UserResponse {
     description: 'User\'s email',
   })
     email: string;
+  
+  @ApiProperty({
+    description: 'User\'s name',
+  })
+    username: string;
 
   @ApiProperty({
     description: 'User\'s avatar link',
@@ -19,7 +24,7 @@ export class UserResponse {
   @ApiProperty({
     description: 'When user was created',
   })
-    created_at: string;
+    created_at: Date;
 }
 
 export class UsersResponse {

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../../databases/repositories/user.repository';
 import { UserCreateDTO } from '../dtos/user.create.dto';
 import { UserDTO } from '../dtos/user.dto';
+import { UserUpdateDTO } from '../dtos/user.update.dto';
 
 @Injectable()
 export class UserService {
@@ -33,7 +34,13 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  deleteAll () {
-    return this.userRepository.deleteAll();
-  } 
+  update (userId: string, data: UserUpdateDTO) {
+    return this.userRepository.updateById(userId, data);
+  }
+
+  delete (userId: string) {
+    return this.userRepository.delete({
+      id: userId,
+    });
+  }
 }

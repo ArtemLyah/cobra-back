@@ -7,9 +7,9 @@ export class UserMapper {
     return {
       id: user.id,
       email: user.email,
+      username: user.username,
       avatar: user.avatar,
       created_at: user.created_at,
-      passwordHash: user.passwordHash,
     };
   }
 

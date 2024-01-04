@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { UsersEntity } from '../entities/users.entity';
 
 @Injectable()
@@ -49,7 +49,23 @@ export class UserRepository {
     });
   }
 
-  async deleteAll () {
-    return this.repository.remove(await this.find());
+  async update (where: FindOneOptions<UsersEntity>, data: DeepPartial<UsersEntity>) {
+    const entity = await this.repository.findOne(where);
+    return this.repository.save({
+      ...entity,
+      ...data,
+    });
+  }
+  
+  updateById (userId: string, query: DeepPartial<UsersEntity>) {
+    return this.update({
+      where: {
+        id: userId,
+      },
+    }, query);
+  }
+
+  delete (where: FindOptionsWhere<UsersEntity>) {
+    return this.repository.delete(where);
   }
 }
