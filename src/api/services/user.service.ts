@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserRepository } from '../../databases/repositories/user.repository';
 import { UserCreateDTO } from '../dtos/user.create.dto';
 import { UserDTO } from '../dtos/user.dto';
 import { UserUpdateDTO } from '../dtos/user.update.dto';
+import { UserUpdatePasswordDTO } from '../dtos/user.update.password.dto';
+import { matchHash, hashString } from '../../utils/functionUtils';
 
 @Injectable()
 export class UserService {
@@ -37,6 +39,18 @@ export class UserService {
   update (userId: string, data: UserUpdateDTO) {
     return this.userRepository.updateById(userId, data);
   }
+  
+  async updatePassword (userId: string, data: UserUpdatePasswordDTO) {
+    const user = await this.userRepository.findById(userId);
+
+    if (!await matchHash(data.oldPassword, user.passwordHash)) {
+      throw new UnauthorizedException('Wrong password');
+    }
+    
+    return this.userRepository.updateById(userId, {
+      passwordHash: await hashString(data.newPassword),
+    });
+  }
 
   delete (userId: string) {
     return this.userRepository.delete({
@@ -44,3 +58,4 @@ export class UserService {
     });
   }
 }
+

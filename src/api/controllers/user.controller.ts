@@ -7,9 +7,10 @@ import { UserResponse, UsersResponse } from '../responses/user.response';
 import { ApiEndpoint } from '../../decorators/ApiEndpoint';
 import { UserUpdateDTO } from '../dtos/user.update.dto';
 import { OkResponse } from '../responses/ok.response';
+import { UserUpdatePasswordDTO } from '../dtos/user.update.password.dto';
 
-@ApiTags('users')
-@Controller('users')
+@ApiTags('user')
+@Controller('user')
 export class UserController {
   constructor (
     private userService: UserService,
@@ -69,6 +70,7 @@ export class UserController {
 
     InvalidBodyException:
       Username must be string
+      Email must be email
       Link of the avatar is not valid
     `,
   })
@@ -89,6 +91,48 @@ export class UserController {
     return this.userMapper.get(user);
   }
   
+  @ApiOkResponse({
+    type: OkResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: `
+    UnauthorizedException:
+      Unauthorized
+      Invalid token
+      User is unauthorized
+    `,
+  })
+  @ApiBadRequestResponse({
+    description: `
+    InvalidEntityIdException:
+      User with such id is not found
+
+    InvalidBodyException:
+      Password cannot be empty
+      Min length of password must be 8
+      Max length of password must be 32
+      Password is not valid
+    `,
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'User\'s id',
+  })
+  @ApiEndpoint({
+    summary: 'Update user\'s password',
+    isBearer: true,
+  })
+  @Patch('/:userId/updatePassword') 
+  async updatePassword (
+    @Param('userId', UserByIdPipe) userId: string,
+    @Body() data: UserUpdatePasswordDTO,
+  ): Promise<OkResponse> {
+    await this.userService.updatePassword(userId, data);
+    return {
+      message: 'Ok',
+    };
+  }
+
   @ApiOkResponse({
     type: OkResponse,
   })
