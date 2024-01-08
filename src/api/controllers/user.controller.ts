@@ -1,16 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
-import { UserByIdPipe } from '../../security/pipes/UserWithIdPipe';
+import { Body, Controller, Delete, Get, Patch, Req } from '@nestjs/common';
 import { UserService } from '../services/user.service';
-import { ApiBadRequestResponse, ApiOkResponse, ApiParam, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiForbiddenResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { UserMapper } from '../mappers/user.mapper';
 import { UserResponse, UsersResponse } from '../responses/user.response';
 import { ApiEndpoint } from '../../decorators/ApiEndpoint';
 import { UserUpdateDTO } from '../dtos/user.update.dto';
 import { OkResponse } from '../responses/ok.response';
 import { UserUpdatePasswordDTO } from '../dtos/user.update.password.dto';
+import { RequestUserData } from '../types/RequestUserData.type';
+import { TokenPayload } from '../types/TokenPayload.type';
 
-@ApiTags('user')
-@Controller('user')
+@ApiTags('users')
+@Controller('users')
 export class UserController {
   constructor (
     private userService: UserService,
@@ -32,23 +33,27 @@ export class UserController {
   @ApiOkResponse({
     type: UserResponse,
   })
-  @ApiBadRequestResponse({
+  @ApiUnauthorizedResponse({
     description: `
-    InvalidEntityIdException:
-      User with such id is not found
+    UnauthorizedException:
+      Unauthorized
+      Invalid token
+      User is unauthorized
     `,
   })
-  @ApiParam({
-    name: 'userId',
-    description: 'User\'s id',
+  @ApiForbiddenResponse({
+    description: `
+    ForbiddenException:
+      User is unauthorized
+    `,
   })
   @ApiEndpoint({
     summary: 'return user\'s information',
     isBearer: true,
   })
-  @Get('/:userId') 
-  async get (@Param('userId', UserByIdPipe) userId: string) {
-    const user = await this.userService.getById(userId);
+  @Get('/me') 
+  async getMe (@Req() req: RequestUserData<TokenPayload>) {
+    const user = await this.userService.getById(req.user.userId);
     return this.userMapper.get(user);
   }
   
@@ -63,31 +68,30 @@ export class UserController {
       User is unauthorized
     `,
   })
+  @ApiForbiddenResponse({
+    description: `
+    ForbiddenException:
+      User is unauthorized
+    `,
+  })
   @ApiBadRequestResponse({
     description: `
-    InvalidEntityIdException:
-      User with such id is not found
-
     InvalidBodyException:
       Username must be string
       Email must be email
       Link of the avatar is not valid
     `,
   })
-  @ApiParam({
-    name: 'userId',
-    description: 'User\'s id',
-  })
   @ApiEndpoint({
     summary: 'Update user info',
     isBearer: true,
   })
-  @Patch('/:userId') 
+  @Patch('/update') 
   async update (
-    @Param('userId', UserByIdPipe) userId: string,
+    @Req() req: RequestUserData<TokenPayload>,
     @Body() data: UserUpdateDTO,
   ): Promise<UserResponse> {
-    const user = await this.userService.update(userId, data);
+    const user = await this.userService.update(req.user.userId, data);
     return this.userMapper.get(user);
   }
   
@@ -102,11 +106,14 @@ export class UserController {
       User is unauthorized
     `,
   })
+  @ApiForbiddenResponse({
+    description: `
+    ForbiddenException:
+      User is unauthorized
+    `,
+  })
   @ApiBadRequestResponse({
     description: `
-    InvalidEntityIdException:
-      User with such id is not found
-
     InvalidBodyException:
       Password cannot be empty
       Min length of password must be 8
@@ -114,20 +121,16 @@ export class UserController {
       Password is not valid
     `,
   })
-  @ApiParam({
-    name: 'userId',
-    description: 'User\'s id',
-  })
   @ApiEndpoint({
     summary: 'Update user\'s password',
     isBearer: true,
   })
-  @Patch('/:userId/updatePassword') 
+  @Patch('/updatePassword') 
   async updatePassword (
-    @Param('userId', UserByIdPipe) userId: string,
+    @Req() req: RequestUserData<TokenPayload>,
     @Body() data: UserUpdatePasswordDTO,
   ): Promise<OkResponse> {
-    await this.userService.updatePassword(userId, data);
+    await this.userService.updatePassword(req.user.userId, data);
     return {
       message: 'Ok',
     };
@@ -144,25 +147,21 @@ export class UserController {
       User is unauthorized
     `,
   })
-  @ApiBadRequestResponse({
+  @ApiForbiddenResponse({
     description: `
-    InvalidEntityIdException:
-      User with such id is not found
+    ForbiddenException:
+      User is unauthorized
     `,
   })
   @ApiEndpoint({
     summary: 'Delete user',
     isBearer: true,
   })
-  @ApiParam({
-    name: 'userId',
-    description: 'User\'s id',
-  })
-  @Delete('/:userId') 
+  @Delete('/deleteAccount') 
   async delete (
-    @Param('userId', UserByIdPipe) userId: string,
+    @Req() req: RequestUserData<TokenPayload>,
   ): Promise<OkResponse> {
-    await this.userService.delete(userId);
+    await this.userService.delete(req.user.userId);
     return {
       message: 'Ok',
     };

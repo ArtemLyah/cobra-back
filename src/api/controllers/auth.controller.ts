@@ -1,12 +1,12 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { Request } from 'express';
+import { ApiBadRequestResponse, ApiForbiddenResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ApiEndpoint } from '../../decorators/ApiEndpoint';
 import { LoginDTO } from '../dtos/login.dto';
 import { RegisterDTO } from '../dtos/register.dto';
 import { TokenResponse } from '../responses/token.response';
-import { UserTokenResponse } from '../responses/userToken.response';
+import { UserFromTokenResponse } from '../responses/userFromToken.response';
 import { AuthService } from '../services/auth.service';
+import { RequestUserData } from '../types/RequestUserData.type';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -69,7 +69,7 @@ export class AuthController {
   }
 
   @ApiOkResponse({
-    type: UserTokenResponse,
+    type: UserFromTokenResponse,
   })
   @ApiUnauthorizedResponse({
     description: `
@@ -79,12 +79,18 @@ export class AuthController {
       User is unauthorized
     `,
   })
+  @ApiForbiddenResponse({
+    description: `
+    ForbiddenException:
+      User is unauthorized
+    `,
+  })
   @ApiEndpoint({
     summary: 'Verify jwt token',
     isBearer: true,
   })
   @Get('verifyToken')
-  verifyToken (@Req() req: Request): Promise<UserTokenResponse> {
-    return req['user'];
+  verifyToken (@Req() req: RequestUserData): Promise<UserFromTokenResponse> {
+    return req.user;
   }
 }

@@ -5,6 +5,8 @@ import { hashString, matchHash } from '../../utils/functionUtils';
 import { RegisterDTO } from '../dtos/register.dto';
 import { LoginDTO } from '../dtos/login.dto';
 import { UserService } from './user.service';
+import { TokenPayload } from '../types/TokenPayload.type';
+import { TokenResponse } from '../responses/token.response';
 
 @Injectable()
 export class AuthService {
@@ -21,13 +23,12 @@ export class AuthService {
     if (!user || !await matchHash(login.password, user.passwordHash)) {
       throw new UnauthorizedException('Wrong email or password');
     }
-    
-    const result = await this.jwtService.signAsync({
-      user_id: user.id,
+
+    return this.getTokens({
+      userId: user.id,
+      username: user.username,
+      avatar: user.avatar,
     });
-    return {
-      access_token: result,
-    };
   }
 
   async register (data: RegisterDTO) {
@@ -38,16 +39,25 @@ export class AuthService {
       throw new AlreadyRegisteredException();
     }
 
-    const { id } = await this.userService.create({
+    const { id, username, avatar } = await this.userService.create({
       ...data,
       password: await hashString(data.password),
     });
-    const result = await this.jwtService.signAsync({
-      user_id: id,
-    });
     
+    return this.getTokens({
+      userId: id,
+      username,
+      avatar,
+    });
+  }
+
+  async getTokens (payload: TokenPayload): Promise<TokenResponse> {
+    const access_token = await this.jwtService.signAsync(payload, {
+      expiresIn: 60*60*24*7,
+    });
+
     return {
-      access_token: result,
+      access_token,
     };
   }
 }

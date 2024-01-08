@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UserTokenResponse {
+export class UserFromTokenResponse {
   @ApiProperty({
     description: 'User\'s id',
   })

@@ -21,7 +21,6 @@ module.exports = {
     'block-spacing': 'error',
     'space-before-blocks': 'error',
     'space-before-function-paren': 'error',
-    'space-infix-ops': 'error',
     'semi': 'error',
     'quotes': ['error', 'single'],
     'brace-style': ['error', 'stroustrup'],
