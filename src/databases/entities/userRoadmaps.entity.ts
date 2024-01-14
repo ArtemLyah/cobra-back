@@ -3,10 +3,10 @@ import { RoadmapsEntity } from './roadmaps.entity';
 import { UsersEntity } from './users.entity';
 
 export enum UserRoadmapState {
-  PASSED,
-  SIGNED,
-  FAVORITE,
-  OWNER,
+  PASSED='PASSED',
+  SIGNED='SIGNED',
+  FAVORITE='FAVORITE',
+  OWNER='OWNER',
 }
 
 @Entity({

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { RoadmapsEntity } from './roadmaps.entity';
 
 @Entity({
@@ -11,11 +11,13 @@ export class TagsEntity {
   @Column({
     length: 60,
   })
+  @Index({
+    unique: true,
+  })
     name: string;
 
   @ManyToMany(() => RoadmapsEntity, (roadmap) => roadmap.tags, {
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
   })
-  @JoinTable()
     roadmaps: RoadmapsEntity[];
 }

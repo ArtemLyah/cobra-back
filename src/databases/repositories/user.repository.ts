@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOneOptions, FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { UsersEntity } from '../entities/users.entity';
 
 @Injectable()
 export class UserRepository {
-  private relations = {
+  private relations: FindOptionsRelations<UsersEntity> = {
     reviews: true,
     userRoadmaps: true,
   };
@@ -15,22 +15,30 @@ export class UserRepository {
       private repository: Repository<UsersEntity>,
   ) {}
   
-  async create (data: DeepPartial<UsersEntity>):  Promise<UsersEntity> {
+  create (data: DeepPartial<UsersEntity>): Promise<UsersEntity> {
     const user = this.repository.create(data);
-    return await this.repository.save(user);
+    return this.repository.save(user);
   }
   
-  find (query?: FindManyOptions<UsersEntity>): Promise<UsersEntity[]> {
+  find (
+    where?: FindOptionsWhere<UsersEntity>, 
+    query?: FindManyOptions<UsersEntity>,
+  ): Promise<UsersEntity[]> {
     return this.repository.find({
+      where,
       relations: this.relations,
       ...query,
     });
   }
 
-  async findOne (query?: FindOneOptions<UsersEntity>): Promise<UsersEntity> {
+  async findOne (
+    where?: FindOptionsWhere<UsersEntity>, 
+    query?: FindOneOptions<UsersEntity>,
+  ): Promise<UsersEntity> {
     let response: UsersEntity;
     try {
       response = await this.repository.findOne({
+        where, 
         relations: this.relations,
         ...query,
       });  
@@ -41,27 +49,28 @@ export class UserRepository {
     return response;
   }
 
-  findById (userId: string): Promise<UsersEntity|null> {
+  findById (userId: string, query?: FindOneOptions<UsersEntity>): Promise<UsersEntity | null> {
     return this.findOne({
-      where: {
-        id: userId,
-      },
-    });
+      id: userId,
+    }, query);
   }
 
-  async update (where: FindOneOptions<UsersEntity>, data: DeepPartial<UsersEntity>) {
-    const entity = await this.repository.findOne(where);
+  async update (
+    where: FindOptionsWhere<UsersEntity>, 
+    data: Partial<UsersEntity>,
+  ): Promise<UsersEntity> {
+    const entity = await this.repository.findOne({
+      where,
+    });
     return this.repository.save({
       ...entity,
       ...data,
     });
   }
   
-  updateById (userId: string, query: DeepPartial<UsersEntity>) {
+  updateById (userId: string, query: Partial<UsersEntity>): Promise<UsersEntity> {
     return this.update({
-      where: {
-        id: userId,
-      },
+      id: userId,
     }, query);
   }
 

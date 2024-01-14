@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ReviewsEntity } from './review.entity';
-import { UserRoadmapsEntity } from './user_roadmaps.entity';
+import { RoadmapsEntity } from './roadmaps.entity';
+import { UserRoadmapsEntity } from './userRoadmaps.entity';
 
 @Entity({
   name: 'users',
@@ -33,12 +34,18 @@ export class UsersEntity {
     avatar: string;
 
   @OneToMany(() => UserRoadmapsEntity, (userRoadmaps) => userRoadmaps.user, {
-    onDelete: 'NO ACTION',
+    onDelete: 'CASCADE',
   })
     userRoadmaps: UserRoadmapsEntity[];
   
+  @OneToMany(() => RoadmapsEntity, (roadmaps) => roadmaps.owner, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+    roadmaps: RoadmapsEntity[];
+  
   @OneToMany(() => ReviewsEntity, (reviews) => reviews.user, {
-    onDelete: 'NO ACTION',
+    onDelete: 'CASCADE',
   })
     reviews: ReviewsEntity[];
 

@@ -8,7 +8,6 @@ import { UserUpdateDTO } from '../dtos/user.update.dto';
 import { OkResponse } from '../responses/ok.response';
 import { UserUpdatePasswordDTO } from '../dtos/user.update.password.dto';
 import { RequestUserData } from '../types/RequestUserData.type';
-import { TokenPayload } from '../types/TokenPayload.type';
 
 @ApiTags('users')
 @Controller('users')
@@ -52,7 +51,7 @@ export class UserController {
     isBearer: true,
   })
   @Get('/me') 
-  async getMe (@Req() req: RequestUserData<TokenPayload>) {
+  async getMe (@Req() req: RequestUserData) {
     const user = await this.userService.getById(req.user.userId);
     return this.userMapper.get(user);
   }
@@ -88,10 +87,10 @@ export class UserController {
   })
   @Patch('/update') 
   async update (
-    @Req() req: RequestUserData<TokenPayload>,
+    @Req() req: RequestUserData,
     @Body() data: UserUpdateDTO,
   ): Promise<UserResponse> {
-    const user = await this.userService.update(req.user.userId, data);
+    const user = await this.userService.updateById(req.user.userId, data);
     return this.userMapper.get(user);
   }
   
@@ -127,7 +126,7 @@ export class UserController {
   })
   @Patch('/updatePassword') 
   async updatePassword (
-    @Req() req: RequestUserData<TokenPayload>,
+    @Req() req: RequestUserData,
     @Body() data: UserUpdatePasswordDTO,
   ): Promise<OkResponse> {
     await this.userService.updatePassword(req.user.userId, data);
@@ -159,7 +158,7 @@ export class UserController {
   })
   @Delete('/deleteAccount') 
   async delete (
-    @Req() req: RequestUserData<TokenPayload>,
+    @Req() req: RequestUserData,
   ): Promise<OkResponse> {
     await this.userService.delete(req.user.userId);
     return {

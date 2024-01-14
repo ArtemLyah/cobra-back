@@ -4,7 +4,7 @@ import { ApiEndpoint } from '../../decorators/ApiEndpoint';
 import { LoginDTO } from '../dtos/login.dto';
 import { RegisterDTO } from '../dtos/register.dto';
 import { TokenResponse } from '../responses/token.response';
-import { UserFromTokenResponse } from '../responses/userFromToken.response';
+import { TokenPayloadResponse } from '../responses/TokenPayload.response';
 import { AuthService } from '../services/auth.service';
 import { RequestUserData } from '../types/RequestUserData.type';
 
@@ -69,7 +69,7 @@ export class AuthController {
   }
 
   @ApiOkResponse({
-    type: UserFromTokenResponse,
+    type: TokenPayloadResponse,
   })
   @ApiUnauthorizedResponse({
     description: `
@@ -90,7 +90,33 @@ export class AuthController {
     isBearer: true,
   })
   @Get('verifyToken')
-  verifyToken (@Req() req: RequestUserData): Promise<UserFromTokenResponse> {
+  verifyToken (@Req() req: RequestUserData): TokenPayloadResponse {
     return req.user;
+  }
+
+  @ApiOkResponse({
+    type: TokenPayloadResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: `
+    UnauthorizedException:
+      Unauthorized
+      Invalid token
+      User is unauthorized
+    `,
+  })
+  @ApiForbiddenResponse({
+    description: `
+    ForbiddenException:
+      User is unauthorized
+    `,
+  })
+  @ApiEndpoint({
+    summary: 'Update current jwt token',
+    isBearer: true,
+  })
+  @Get('updateToken')
+  updateToken (@Req() req: RequestUserData): Promise<TokenResponse> {
+    return this.authService.updateToken(req.user.userId);
   }
 }

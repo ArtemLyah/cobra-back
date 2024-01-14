@@ -1,14 +1,9 @@
-import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { RoadmapDifficultyEnum } from '../../api/types/RoadmapDifficulty.type';
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ReviewsEntity } from './review.entity';
 import { TagsEntity } from './tags.entity';
-import { UserRoadmapsEntity } from './user_roadmaps.entity';
-
-export enum RoadmapDifficultyEnum {
-  BEGINNER,
-  JUNIOR,
-  MIDDLE,
-  SENIOR,
-}
+import { UserRoadmapsEntity } from './userRoadmaps.entity';
+import { UsersEntity } from './users.entity';
 
 @Entity({
   name: 'roadmaps',
@@ -26,33 +21,36 @@ export class RoadmapsEntity {
     description: string;
 
   @Column({
-    nullable: true,
+    enum: RoadmapDifficultyEnum,
   })
-    avatar: string;
+    difficulty: RoadmapDifficultyEnum;
+ 
+  @ManyToMany(() => TagsEntity, (tag) => tag.roadmaps, {
+    onDelete: 'CASCADE',
+    cascade: ['insert', 'update'],
+  })
+  @JoinTable({ name: 'roadmap_tags' })
+    tags: TagsEntity[];
+
+  @OneToMany(() => UserRoadmapsEntity, (userRoadmaps) => userRoadmaps.roadmap, {
+    onDelete: 'CASCADE',
+    cascade: ['insert', 'update'],
+  })
+    userRoadmaps: UserRoadmapsEntity[];
   
+  @ManyToOne(() => UsersEntity, (users) => users.roadmaps, {
+    onDelete: 'SET NULL',
+  })
+    owner: UsersEntity;
+
+  @OneToMany(() => ReviewsEntity, (reviews) => reviews.roadmap, {
+    onDelete: 'CASCADE',
+  })
+    reviews: ReviewsEntity[];
+
   @CreateDateColumn()
     created_at: Date;
 
   @UpdateDateColumn()
     updated_at: Date;
-
-  @Column({
-    enum: RoadmapDifficultyEnum,
-  })
-    difficulty: RoadmapDifficultyEnum;
-
-  @ManyToMany(() => TagsEntity, (tag) => tag.roadmaps, {
-    onDelete: 'SET NULL',
-  })
-    tags: TagsEntity[];
-
-  @OneToMany(() => UserRoadmapsEntity, (userRoadmaps) => userRoadmaps.roadmap, {
-    onDelete: 'NO ACTION',
-  })
-    userRoadmaps: UserRoadmapsEntity[];
-  
-  @OneToMany(() => ReviewsEntity, (reviews) => reviews.roadmap, {
-    onDelete: 'NO ACTION',
-  })
-    reviews: ReviewsEntity[];
 }

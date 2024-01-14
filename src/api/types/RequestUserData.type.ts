@@ -1,5 +1,6 @@
 import { Request } from 'express';
+import { TokenPayload } from './TokenPayload.type';
 
-export interface RequestUserData<Data=any> extends Request {
-  user: Data, 
+export interface RequestUserData extends Request {
+  user: TokenPayload, 
 }

@@ -5,6 +5,7 @@ import { UserDTO } from '../dtos/user.dto';
 import { UserUpdateDTO } from '../dtos/user.update.dto';
 import { UserUpdatePasswordDTO } from '../dtos/user.update.password.dto';
 import { matchHash, hashString } from '../../utils/functionUtils';
+import { UsersEntity } from 'src/databases/entities/users.entity';
 
 @Injectable()
 export class UserService {
@@ -22,9 +23,7 @@ export class UserService {
 
   get (user: UserDTO) {
     return this.userRepository.findOne({
-      where: {
-        ...user,
-      },
+      ...user,
     });
   }
 
@@ -36,11 +35,11 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  update (userId: string, data: UserUpdateDTO) {
+  updateById (userId: string, data: UserUpdateDTO): Promise<UsersEntity> {
     return this.userRepository.updateById(userId, data);
   }
   
-  async updatePassword (userId: string, data: UserUpdatePasswordDTO) {
+  async updatePassword (userId: string, data: UserUpdatePasswordDTO): Promise<UsersEntity> {
     const user = await this.userRepository.findById(userId);
 
     if (!await matchHash(data.oldPassword, user.passwordHash)) {

@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UserFromTokenResponse {
+export class TokenPayloadResponse {
   @ApiProperty({
     description: 'User\'s id',
   })
-    id: string;
+    userId: string;
     
   @ApiProperty({
     description: 'User\'s name',

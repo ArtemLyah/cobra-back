@@ -24,7 +24,7 @@ export class AuthService {
       throw new UnauthorizedException('Wrong email or password');
     }
 
-    return this.getTokens({
+    return this.getToken({
       userId: user.id,
       username: user.username,
       avatar: user.avatar,
@@ -44,14 +44,14 @@ export class AuthService {
       password: await hashString(data.password),
     });
     
-    return this.getTokens({
+    return this.getToken({
       userId: id,
       username,
       avatar,
     });
   }
 
-  async getTokens (payload: TokenPayload): Promise<TokenResponse> {
+  async getToken (payload: TokenPayload): Promise<TokenResponse> {
     const access_token = await this.jwtService.signAsync(payload, {
       expiresIn: 60*60*24*7,
     });
@@ -59,5 +59,14 @@ export class AuthService {
     return {
       access_token,
     };
+  }
+
+  async updateToken (userId: string): Promise<TokenResponse> {
+    const user = await this.userService.getById(userId);
+    return this.getToken({
+      userId: user.id,
+      avatar: user.avatar,
+      username: user.username,
+    });
   }
 }
