@@ -4,7 +4,7 @@ import { ApiEndpoint } from '../../decorators/ApiEndpoint';
 import { LoginDTO } from '../dtos/login.dto';
 import { RegisterDTO } from '../dtos/register.dto';
 import { TokenResponse } from '../responses/token.response';
-import { TokenPayloadResponse } from '../responses/TokenPayload.response';
+import { TokenPayloadResponse } from '../responses/tokenPayload.response';
 import { AuthService } from '../services/auth.service';
 import { RequestUserData } from '../types/RequestUserData.type';
 

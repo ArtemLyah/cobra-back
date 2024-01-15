@@ -28,5 +28,5 @@ export const postgresConfig = (entities: Function[]) => {
 
 export const mongoConfig = () => {
   const dbConfig = configuration().databases.mongo;
-  return `mongodb://${dbConfig.host}:${dbConfig.port}/${dbConfig.database}`;
+  return `mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.host}:${dbConfig.port}/${dbConfig.database}?authSource=admin`;
 };

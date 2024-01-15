@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, Matches } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 import { validationOptionsMsg } from 'src/utils/validation';
 import { RoadmapDifficultyEnum } from '../types/RoadmapDifficulty.type';
 
@@ -28,9 +28,5 @@ export class RoadmapCreateDTO {
     description: 'Roadmap tags',
   })
   @IsNotEmpty(validationOptionsMsg('Tags cannot be empty'))
-  @Matches(/#\w+/, {
-    each: true,
-    ...validationOptionsMsg('Tags must starts with #'),
-  })
     tags: string[];
 }

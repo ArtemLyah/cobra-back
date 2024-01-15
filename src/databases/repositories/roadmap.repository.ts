@@ -42,7 +42,7 @@ export class RoadmapRepository {
       where,
       relations: this.relations,
       ...query,
-    });
+    }).catch(() => null);
   }
 
   findById (roadmapId: string, query?: FindOneOptions<RoadmapsEntity>): Promise<RoadmapsEntity> {

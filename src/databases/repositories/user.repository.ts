@@ -35,18 +35,11 @@ export class UserRepository {
     where?: FindOptionsWhere<UsersEntity>, 
     query?: FindOneOptions<UsersEntity>,
   ): Promise<UsersEntity> {
-    let response: UsersEntity;
-    try {
-      response = await this.repository.findOne({
-        where, 
-        relations: this.relations,
-        ...query,
-      });  
-    } 
-    catch (error) {
-      response = null;
-    }
-    return response;
+    return await this.repository.findOne({
+      where, 
+      relations: this.relations,
+      ...query,
+    }).catch(() => null);  
   }
 
   findById (userId: string, query?: FindOneOptions<UsersEntity>): Promise<UsersEntity | null> {

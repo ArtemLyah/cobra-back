@@ -1,13 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Schema as MongoSchema, HydratedDocument } from 'mongoose';
+import { HydratedDocument, now } from 'mongoose';
 
-@Schema()
+@Schema({ timestamps: true, id: true, collection: 'maps' })
 export class MapsModel {
-  @Prop({ type: MongoSchema.Types.UUID, required: true })
+  @Prop({ required: true })
     roadmap_id: string;
   
-  @Prop({ required: true })
-    structure: MongoSchema.Types.Mixed;
+  @Prop({ 
+    type: String, 
+    required: true,
+  })
+    structure: string;
+
+  @Prop({ default: now() })
+    createdAt?: Date;
+
+  @Prop({ default: now() })
+    updatedAt?: Date;
 }
 
 export type MapsDocument = HydratedDocument<MapsModel>;
