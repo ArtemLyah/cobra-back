@@ -1,19 +1,18 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { UserRoadmapState } from '../../api/types/userRoadmapState.type';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { RoadmapsEntity } from './roadmaps.entity';
 import { UsersEntity } from './users.entity';
-
-export enum UserRoadmapState {
-  PASSED='PASSED',
-  SIGNED='SIGNED',
-  FAVORITE='FAVORITE',
-  OWNER='OWNER',
-}
 
 @Entity({
   name: 'user_roadmaps',
 })
 export class UserRoadmapsEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
+    id: string;
+
+  @Column({
+    type: 'uuid',
+  })
     userId: string;
 
   @ManyToOne(() => UsersEntity, (user) => user.userRoadmaps, {
@@ -21,7 +20,9 @@ export class UserRoadmapsEntity {
   })
     user: UsersEntity;
 
-  @PrimaryColumn()
+  @Column({
+    type: 'uuid',
+  })
     roadmapId: string;
 
   @ManyToOne(() => RoadmapsEntity, (roadmap) => roadmap.userRoadmaps, {

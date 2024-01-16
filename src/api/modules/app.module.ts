@@ -6,6 +6,7 @@ import { UserModule } from './user.module';
 import { AuthModule } from './auth.module';
 import { RoadmapModule } from './roadmap.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ReviewModule } from './review.module';
 
 @Module({
   imports: [
@@ -17,10 +18,11 @@ import { JwtModule } from '@nestjs/jwt';
       isGlobal: true,
       load: [configuration],
     }),
+    DatabaseModule,
     AuthModule,
     UserModule, 
     RoadmapModule,
-    DatabaseModule,
+    ReviewModule,
   ],
 })
 export class AppModule {}

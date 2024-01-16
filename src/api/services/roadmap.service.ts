@@ -1,13 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { TagsEntity } from 'src/databases/entities/tags.entity';
-import { UserRoadmapState } from '../../databases/entities/userRoadmaps.entity';
+import { UserRoadmapsEntity } from '../../databases/entities/userRoadmaps.entity';
 import { RoadmapRepository } from '../../databases/repositories/roadmap.repository';
-import { DeepPartial, In } from 'typeorm';
+import { DeepPartial, In, Raw } from 'typeorm';
 import { RoadmapCreateDTO } from '../dtos/roadmap.create.dto';
 import { TagRepository } from '../../databases/repositories/tag.repository';
 import { FullRoadmapCreateDTO } from '../dtos/fullRoadmap.create.dto';
 import { MapRepository } from '../../databases/repositories/map.repository';
-import { RoadmapWithMap } from '../types/RoadmapWithMap.type';
+import { FullRoadmap } from '../types/RoadmapWithMap.type';
+import { UserRoadmapRepository } from '../../databases/repositories/userRoadmap.repository';
+import { RoadmapsEntity } from '../../databases/entities/roadmaps.entity';
+import { RoadmapFilterByDTO } from '../dtos/roadmapFilterBy.dto';
+import { RoadmapDifficultyEnum } from '../types/RoadmapDifficulty.type';
+import { UserRoadmapState } from '../types/userRoadmapState.type';
+import { OkResponse } from '../responses/ok.response';
+import { RoadmapSortBy } from '../types/RoadmapSortBy.type';
 
 @Injectable()
 export class RoadmapService {
@@ -15,6 +22,7 @@ export class RoadmapService {
   private roadmapRepository: RoadmapRepository,
   private mapRepository: MapRepository,
   private tagRepository: TagRepository,
+  private userRoadmapRepository: UserRoadmapRepository,
   ) {}
 
   async create (userId: string, data: RoadmapCreateDTO) {
@@ -56,24 +64,99 @@ export class RoadmapService {
   }
 
   getById (roadmapId: string) {
-    return this.roadmapRepository.findById(roadmapId);
+    return this.roadmapRepository.findById(roadmapId, {
+      relations: {
+        userRoadmaps: true,
+        owner: true,
+        tags: true,
+        reviews: {
+          user: true,
+        },
+      },
+    });
   }
   
-  getMany () {
-    return this.roadmapRepository.find();
+  getMany (filterBy?: RoadmapFilterByDTO, sortBy: RoadmapSortBy): Promise<RoadmapsEntity[]> {
+    const findTitle = filterBy.name ? {
+      title: Raw(alias => `LOWER(${alias}) Like LOWER('%${filterBy.name}%')`),
+    } : {};
+    return this.roadmapRepository.find({
+      ...findTitle,
+      difficulty: In(filterBy.difficulty ?? [
+        RoadmapDifficultyEnum.BEGINNER,
+        RoadmapDifficultyEnum.JUNIOR,
+        RoadmapDifficultyEnum.MIDDLE,
+        RoadmapDifficultyEnum.SENIOR,
+      ]),
+    }, {
+      order: {
+        
+      }
+    });
   } 
 
-  async getWithMap (roadmapId: string): Promise<RoadmapWithMap> {
+  async getWithMap (roadmapId: string): Promise<FullRoadmap> {
     const map = await this.mapRepository.findById(roadmapId);
     const roadmap = await this.roadmapRepository.findById(roadmapId, {
       relations: {
+        userRoadmaps: true,
         owner: true,
         tags: true,
+        reviews: {
+          user: true,
+        },
       },
     });
     return {
       roadmap,
       map,
     };
+  }
+
+  async setUserState (
+    roadmapId: string, 
+    userId: string, 
+    state: UserRoadmapState,
+  ): Promise<UserRoadmapsEntity> {
+    if (state === UserRoadmapState.OWNER) {
+      throw new ForbiddenException('Cannot assign state as owner of the roadmap');
+    }
+    const userState = await this.userRoadmapRepository.findOne({
+      roadmapId,
+      userId,
+      state,
+    });
+
+    if (userState) return userState; 
+
+    return this.userRoadmapRepository.create({
+      userId,
+      roadmapId,
+      state,
+    });
+  }
+
+  async removeUserState (
+    roadmapId: string, 
+    userId: string, 
+    state: UserRoadmapState,
+  ): Promise<OkResponse> {
+    await this.userRoadmapRepository.delete({
+      userId,
+      roadmapId,
+      state,
+    });
+    return {
+      message: 'Ok',
+    };
+  }
+
+  async getAllUserMaps (userId: string): Promise<RoadmapsEntity[]> {
+    return this.roadmapRepository.find({
+      userRoadmaps: {
+        userId,
+        state: In([ UserRoadmapState.FAVORITE, UserRoadmapState.OWNER, UserRoadmapState.SIGNED ]),
+      },
+    });
   }
 }

@@ -53,7 +53,7 @@ export class AuthService {
 
   async getToken (payload: TokenPayload): Promise<TokenResponse> {
     const access_token = await this.jwtService.signAsync(payload, {
-      expiresIn: 60*60*24*7,
+      expiresIn: '7d',
     });
 
     return {

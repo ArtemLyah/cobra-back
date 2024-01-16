@@ -11,6 +11,7 @@ export class RoadmapRepository {
     },
     reviews: true,
     tags: true,
+    owner: true,
   };
   
   constructor (
@@ -53,7 +54,7 @@ export class RoadmapRepository {
 
   async update (
     where: FindOptionsWhere<RoadmapsEntity>, 
-    data: Partial<RoadmapsEntity>,
+    data: DeepPartial<RoadmapsEntity>,
   ): Promise<RoadmapsEntity> {
     const roadmap = await this.findOne(where);
     return this.repository.save({
@@ -62,13 +63,17 @@ export class RoadmapRepository {
     });
   }
 
-  updateById (userId: string, query: Partial<RoadmapsEntity>) {
+  updateById (roadmapId: string, query: Partial<RoadmapsEntity>) {
     return this.update({
-      id: userId,
+      id: roadmapId,
     }, query);
   }
 
   delete (where: FindOptionsWhere<RoadmapsEntity>) {
     return this.repository.delete(where);
+  }
+
+  createQuery () {
+    return this.repository.createQueryBuilder('roadmaps');
   }
 }
