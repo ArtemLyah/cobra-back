@@ -38,6 +38,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     res.status(status as number).json({
       error: errorName,
+      type: exception.constructor.name,
       status,
       ...message,
     });

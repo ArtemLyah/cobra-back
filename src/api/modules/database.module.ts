@@ -12,7 +12,9 @@ import { UserRepository } from '../../databases/repositories/user.repository';
 import { UserProgressModel, UserProgressSchema } from '../../databases/entities/userProgress.model';
 import { RoadmapRepository } from '../../databases/repositories/roadmap.repository';
 import { TagRepository } from '../../databases/repositories/tag.repository';
-import { MapRepository } from 'src/databases/repositories/map.repository';
+import { MapRepository } from '../../databases/repositories/map.repository';
+import { ReviewRepository } from '../../databases/repositories/review.repository';
+import { UserRoadmapRepository } from '../../databases/repositories/userRoadmap.repository';
 
 @Global()
 @Module({
@@ -39,7 +41,21 @@ import { MapRepository } from 'src/databases/repositories/map.repository';
       { name: UserProgressModel.name, schema: UserProgressSchema, collection: 'userProgress' },
     ]),
   ],
-  providers: [UserRepository, RoadmapRepository, TagRepository, MapRepository],
-  exports: [UserRepository, RoadmapRepository, TagRepository, MapRepository],
+  providers: [
+    UserRepository, 
+    RoadmapRepository, 
+    TagRepository, 
+    MapRepository, 
+    ReviewRepository,
+    UserRoadmapRepository,
+  ],
+  exports: [
+    UserRepository, 
+    RoadmapRepository, 
+    TagRepository, 
+    MapRepository, 
+    ReviewRepository,
+    UserRoadmapRepository,
+  ],
 })
 export class DatabaseModule {}

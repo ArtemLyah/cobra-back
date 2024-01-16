@@ -15,7 +15,7 @@ export class MapRepository {
     return map.save();
   }
 
-  find (filter: FilterQuery<MapsModel>): Promise<MapsDocument[]> {
+  find (filter?: FilterQuery<MapsModel>): Promise<MapsDocument[]> {
     return this.mapModel.find(filter);
   }
   
@@ -28,4 +28,10 @@ export class MapRepository {
       roadmap_id,
     });
   }
+
+  delete (roadmap_id: string) {
+    return this.mapModel.deleteOne({
+      roadmap_id,
+    }).exec();
+  } 
 }
